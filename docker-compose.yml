@@ -1,14 +1,14 @@
 services:
   netbox: &netbox
-    image: docker.io/netboxcommunity/netbox:${VERSION-v4.2-3.2.0}
+    image: docker.io/netboxcommunity/netbox:latest
     depends_on:
       - postgres
       - redis
       - redis-cache
-    env_file: env/netbox.env
+    env_file: stack.env
     user: "unit:root"
     healthcheck:
-      test: curl -f http://localhost:8080/login/ || exit 1
+      test: curl -f http://192.168.100.239:8080/login/ || exit 1
       start_period: 90s
       timeout: 3s
       interval: 15s
@@ -53,7 +53,10 @@ services:
       timeout: 30s
       interval: 10s
       retries: 5
-    env_file: env/postgres.env
+    environment:
+      POSTGRES_DB: netbox
+      POSTGRES_PASSWORD: 2PnLUTi4u!tjdQKcRUL3C4cs!3AN2Y
+      POSTGRES_USER: netbox
     volumes:
       - netbox-postgres-data:/var/lib/postgresql/data
 
@@ -70,7 +73,8 @@ services:
       timeout: 3s
       interval: 1s
       retries: 5
-    env_file: env/redis.env
+    environment:
+      REDIS_PASSWORD: E4MM8p2BQBt2uVVi@GJixfx-Ds-D@D
     volumes:
       - netbox-redis-data:/data
   redis-cache:
@@ -80,7 +84,8 @@ services:
       - -c # this is to evaluate the $REDIS_PASSWORD from the env
       - valkey-server --requirepass $$REDIS_PASSWORD ## $$ because of docker-compose
     healthcheck: *redis-healthcheck
-    env_file: env/redis-cache.env
+    environment:
+      REDIS_PASSWORD: 2TKz@mD4hjQeJe2*JwUXrG-uubN..k
     volumes:
       - netbox-redis-cache-data:/data
 
